@@ -2,8 +2,7 @@ import asyncdispatch, httpclient, json, strutils
 
 var cookie: string = ""
 const api = "https://tempmail.ltd/"
-const token = "oTGvUuTMXjNfpj4ttld8PkGDpvRn4LA6kClCQROp"
-
+var token: string = ""
 proc create_headers(): HttpHeaders =
   result = newHttpHeaders({
     "Connection": "keep-alive",
@@ -19,6 +18,15 @@ proc init_cookie*(): Future[void] {.async.} =
   try:
     client.headers = create_headers()
     let response = await client.get(api)
+    let html = await response.body
+    let doc = parseHtml(html)
+    
+    for meta in doc.findAll("meta"):
+      let name = meta.attr("name")
+      if name == "csrf-token":
+        token = meta.attr("content")
+        break  # Останавливаем поиск после нахождения токена
+    
     if response.headers.hasKey("set-cookie"):
       cookie = response.headers["set-cookie"]
   finally:
