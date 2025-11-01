@@ -25,7 +25,7 @@ proc init_cookie*(): Future[void] {.async.} =
       let name = meta.attr("name")
       if name == "csrf-token":
         token = meta.attr("content")
-        break  # Останавливаем поиск после нахождения токена
+        break
     
     if response.headers.hasKey("set-cookie"):
       cookie = response.headers["set-cookie"]
