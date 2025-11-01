@@ -3,20 +3,17 @@ import asyncdispatch, httpclient, json, strutils, htmlparser, xmltree
 var cookie: string = ""
 const api = "https://tempmail.ltd/"
 var token: string = ""
-proc create_headers(): HttpHeaders =
-  result = newHttpHeaders({
+var headers = newHttpHeaders({
     "Connection": "keep-alive",
-    "Host": "tempmail.ltd",
+    "Host": "tempmail.now",
     "Content-Type": "application/json",
     "accept": "application/json, text/plain, */*"
   })
-  if cookie != "":
-    result["cookie"] = cookie
 
 proc init_cookie*(): Future[void] {.async.} =
   let client = newAsyncHttpClient()
   try:
-    client.headers = create_headers()
+    client.headers = headers
     let response = await client.get(api)
     let html = await response.body
     let doc = parseHtml(html)
@@ -28,18 +25,18 @@ proc init_cookie*(): Future[void] {.async.} =
         break
     
     if response.headers.hasKey("set-cookie"):
-      cookie = response.headers["set-cookie"]
+      headers["cookie"] = response.headers["set-cookie"]
   finally:
     client.close()
 
 proc get_messages*(): Future[JsonNode] {.async.} =
   let client = newAsyncHttpClient()
   try:
-    client.headers = create_headers()
+    client.headers = headers
     let json= %*{"_token": token}
     let response = await client.post(api & "get_messages",body = $json)
     if response.headers.hasKey("set-cookie"):
-      cookie = response.headers["set-cookie"]
+      headers["cookie"] = response.headers["set-cookie"]
     let body = await response.body
     result = parseJson(body)
   finally:
@@ -48,11 +45,11 @@ proc get_messages*(): Future[JsonNode] {.async.} =
 proc delete_email*(): Future[JsonNode] {.async.} =
   let client = newAsyncHttpClient()
   try:
-    client.headers = create_headers()
+    client.headers = headers
     let json= %*{"_token": token}
     let response = await client.post(api & "delete",body = $json)
     if response.headers.hasKey("set-cookie"):
-      cookie = response.headers["set-cookie"]
+      headers["cookie"] = response.headers["set-cookie"]
     let body = await response.body
     result = parseJson(body)
   finally:
