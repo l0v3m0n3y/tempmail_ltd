@@ -5,7 +5,7 @@ const api = "https://tempmail.ltd/"
 var token: string = ""
 var headers = newHttpHeaders({
     "Connection": "keep-alive",
-    "Host": "tempmail.now",
+    "Host": "tempmail.ltd",
     "Content-Type": "application/json",
     "accept": "application/json, text/plain, */*"
   })
