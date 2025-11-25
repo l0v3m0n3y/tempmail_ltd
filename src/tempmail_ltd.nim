@@ -1,6 +1,5 @@
 import asyncdispatch, httpclient, json, strutils, htmlparser, xmltree
 
-var cookie: string = ""
 const api = "https://tempmail.ltd/"
 var token: string = ""
 var headers = newHttpHeaders({
